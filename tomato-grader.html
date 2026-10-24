@@ -1,0 +1,293 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>AgriGrade AI – Smart Tomato Grading</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=DM+Sans:wght@400;500;700&display=swap"><style>
+:root{--paper:#f6efe1;--card:#fffaf0;--ink:#2b2418;--mu:#7a6e58;--ln:#dccfb4;--red:#c4372a;--s1:#f1d3a6;--s2:#f6efe1;--h1:#a9b873;--h2:#8aa05a;--f1:#7a9444;--f2:#708b3c;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#1b1710;--card:#262016;--ink:#f1e8d4;--mu:#a89a7e;--ln:#3d3322;--s1:#3a2b30;--s2:#1b1710;--h1:#33432a;--h2:#2a3a22;--f1:#26331c;--f2:#222e19;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#1b1710;--card:#262016;--ink:#f1e8d4;--mu:#a89a7e;--ln:#3d3322;--s1:#3a2b30;--s2:#1b1710;--h1:#33432a;--h2:#2a3a22;--f1:#26331c;--f2:#222e19;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;font:15px/1.55 "DM Sans",system-ui,sans-serif;color:var(--ink);background:var(--paper)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.08;mix-blend-mode:multiply;z-index:90;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+h1,h3,.stamp{font-family:Fraunces,Georgia,serif}h1{margin:0;font-size:34px;font-weight:800;letter-spacing:-.5px}h1 em{color:var(--red);font-weight:600}h3{margin:0;font-size:18px}
+header{max-width:1200px;margin:auto;display:flex;align-items:center;gap:14px;padding:18px 16px 8px;flex-wrap:wrap}
+main{max-width:1200px;margin:auto;padding:8px 16px 60px;display:grid;gap:16px}.mut{color:var(--mu);font-size:13px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:16px;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 14px 26px -16px rgba(60,35,10,.5)}
+.b{font:inherit;font-weight:700;border:0;border-bottom:3px solid #8f241a;border-radius:10px;padding:9px 16px;color:#fff;background:var(--red);cursor:pointer;transition:transform .1s}.b:active{transform:translateY(2px);border-bottom-width:1px}.b.g{background:var(--card);color:var(--ink);border:1px solid var(--ln);border-bottom:3px solid var(--ln)}.sm{padding:5px 11px;font-size:13px}
+.dzr{display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap}.dz-on{outline:2px dashed var(--red);outline-offset:4px}.row{display:flex;gap:10px;flex-wrap:wrap}
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--ln)}.ctl label{font-size:13px;color:var(--mu);display:block}.ctl input[type=range],#rp{width:100%;accent-color:var(--red)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}.sticky{position:sticky;top:12px}@media(max-width:900px){.grid{grid-template-columns:1fr}.sticky{position:static}}
+#sv{width:100%;height:auto;touch-action:none;cursor:grab;display:block}#sv:active{cursor:grabbing}
+.stamp{width:70px;height:70px;border:3px double;border-radius:50%;display:grid;place-items:center;font-size:24px;font-weight:800;transform:rotate(-10deg);flex:none}
+.ih{display:flex;gap:10px;align-items:baseline;margin-bottom:10px;flex-wrap:wrap}.fl{flex:1}
+.ib{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px}@media(max-width:800px){.ib{grid-template-columns:1fr}}
+.cw{position:relative;overflow:hidden;border-radius:10px;align-self:start;border:1px solid var(--ln)}.cw canvas{width:100%;height:auto;display:block}.cw .a{position:absolute;left:0;top:0;height:100%;cursor:crosshair}
+.cw.lz .a{animation:rv 1.8s ease-in-out}.cw.lz::after{content:"";position:absolute;left:0;right:0;height:26px;background:linear-gradient(#fff0,#fff3c8 50%,#fff0);box-shadow:0 0 30px 12px rgba(255,236,170,.7);animation:lz 1.8s ease-in-out}
+@keyframes rv{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}@keyframes lz{from{top:-26px}to{top:100%}}
+.tl{display:grid;gap:8px;max-height:560px;overflow:auto;align-content:start}
+.tc{display:flex;gap:10px;border:1px solid var(--ln);border-left:6px solid var(--g);border-radius:10px;padding:8px;cursor:pointer;transition:transform .2s,box-shadow .2s;background:var(--card)}.tc:hover{transform:translateX(3px) rotate(-.4deg)}.tc.sel{box-shadow:0 0 0 2px var(--ink),0 10px 18px -8px rgba(0,0,0,.5)}
+.th canvas{width:60px;height:60px;border-radius:50%;border:2px solid var(--ln)}.tb{flex:1;min-width:0}.sc{font-family:Fraunces,Georgia,serif;font-size:20px}
+.br{display:grid;grid-template-columns:50px 1fr;gap:6px;font-size:11px;color:var(--mu);align-items:center}.br i{display:block;height:5px;background:var(--ln);border-radius:9px;overflow:hidden}.br u{display:block;height:100%}.fx{font-size:12px;color:var(--mu);margin-top:3px}
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0}.stats span{font-size:13px;color:var(--mu)}.stats b{display:block;font:800 24px Fraunces,Georgia,serif;color:var(--ink)}.ins{background:var(--paper);border-radius:10px;padding:8px 12px;margin:12px 0}
+.crates{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;perspective:800px;margin-top:12px}
+.cr{cursor:pointer;transform:rotateX(16deg);transform-origin:50% 100%;transition:transform .25s}.cr:hover{transform:rotateX(4deg) translateY(-6px)}.cr.on{outline:2px solid var(--ink);outline-offset:4px;border-radius:8px}
+.cr .top{height:62px;background:#3b2a1b;border-radius:6px 6px 0 0;box-shadow:inset 0 8px 14px rgba(0,0,0,.6);display:flex;flex-wrap:wrap;gap:1px;padding:5px;align-content:flex-end;overflow:hidden}
+.tm{width:14px;height:14px;border-radius:50%;box-shadow:inset -2px -3px 4px rgba(0,0,0,.4),inset 2px 2px 3px rgba(255,255,255,.35)}
+.cr .fr{padding:5px 3px;background:repeating-linear-gradient(0deg,#b8905a 0 12px,#a27b47 12px 14px);border-radius:0 0 6px 6px;text-align:center;color:#2b1a0c;font-weight:700;font-size:12px;box-shadow:0 10px 12px -6px rgba(0,0,0,.5)}.pr{width:44px;font:inherit;font-size:12px;border:1px solid #6b4b25;border-radius:4px;background:#f3e4c4;padding:0 2px}
+#bgw{position:fixed;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(var(--s1),var(--s2) 62%);perspective:520px}
+.sun{position:absolute;right:6%;top:-8%;width:420px;height:420px;background:radial-gradient(circle,rgba(255,214,150,.75),transparent 65%)}.hill{position:absolute;left:-10%;right:-10%;top:44%;height:26%;background:radial-gradient(ellipse at 28% 100%,var(--h1) 55%,transparent 56%),radial-gradient(ellipse at 78% 100%,var(--h2) 50%,transparent 51%)}
+.field{position:absolute;left:-60%;right:-60%;top:66%;bottom:-45%;transform-origin:top;transform:translateX(calc(var(--mx,0)*-40px)) rotateX(62deg);background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(0,0,0,.16) 46px 52px),repeating-linear-gradient(0deg,var(--f1) 0 40px,var(--f2) 40px 80px);opacity:.9}
+.md{position:fixed;inset:0;background:rgba(30,18,6,.7);display:grid;place-items:center;padding:16px;z-index:50}.mb{background:var(--card);border-radius:14px;padding:14px;max-width:min(900px,100%);max-height:90vh;overflow:auto}.mb img{max-width:100%;border-radius:8px}.mb textarea{width:100%;height:260px;background:var(--paper);color:var(--ink);border:1px solid var(--ln);border-radius:8px;padding:8px;font:12px monospace}
+#tip{position:fixed;z-index:60;background:var(--ink);color:var(--paper);padding:3px 9px;border-radius:7px;font-size:12px;pointer-events:none}#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:10px;z-index:60}
+
+.logo{display:flex;align-items:center;gap:9px;font:800 22px Fraunces,Georgia,serif}.mark{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8a6a,#c4372a 55%,#7d170d);position:relative}.mark::before{content:"";position:absolute;left:8px;top:-5px;width:11px;height:8px;background:#4f7a30;border-radius:0 80% 0 80%}.logo small{font:700 11px "DM Sans",system-ui;border:1.5px solid var(--ink);border-radius:5px;padding:0 5px}
+.nav a{color:var(--ink);text-decoration:none;font-weight:500;margin-right:18px;position:relative}.nav a::after{content:"";position:absolute;left:0;right:100%;bottom:-3px;height:2px;background:var(--red);transition:right .25s}.nav a:hover::after{right:0}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;padding:26px 4px 6px}@media(max-width:860px){.hero{grid-template-columns:1fr}}
+.hero h2{font:800 clamp(38px,5.6vw,62px)/1.04 Fraunces,Georgia,serif;letter-spacing:-1.5px;margin:0 0 14px}.hero h2 u{text-decoration:underline wavy var(--red);text-decoration-thickness:3px;text-underline-offset:9px}.lead{font-size:18px;max-width:33em;margin:0 0 18px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.chip{background:var(--card);border:1px solid var(--ln);border-radius:99px;padding:4px 14px;font-size:13px}.chip b{font:800 16px Fraunces,Georgia,serif}
+.stage{position:relative;width:min(360px,78vw);aspect-ratio:1;margin:auto;perspective:900px;--h:4}.stage.bump{animation:sq .55s}@keyframes sq{30%{transform:scale(1.07,.91)}60%{transform:scale(.97,1.04)}}
+.tmt{position:absolute;inset:14% 10% 12%;transform-style:preserve-3d;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .15s;cursor:pointer}
+.bd{position:absolute;inset:0;border-radius:50% 50% 47% 47%/56% 56% 44% 44%;background:radial-gradient(circle at 34% 28%,hsl(var(--h) 85% 70%),hsl(var(--h) 72% 46%) 42%,hsl(var(--h) 70% 25%));box-shadow:inset -18px -24px 40px rgba(0,0,0,.35),inset 10px 12px 24px rgba(255,255,255,.16);transition:background .3s}
+.gl{position:absolute;left:17%;top:15%;width:22%;height:13%;border-radius:50%;background:rgba(255,255,255,.6);filter:blur(6px);transform:rotate(-32deg) translateZ(30px)}
+.cx{position:absolute;left:50%;top:5%;width:46%;height:24%;transform:translateX(-50%) translateZ(46px);transform-style:preserve-3d}.cx::before{content:"";position:absolute;left:50%;top:-24%;width:7%;height:42%;background:#6b5a2a;border-radius:4px;transform:translateX(-50%) rotate(8deg)}
+.cx i{position:absolute;left:50%;top:0;width:30%;height:100%;margin-left:-15%;transform-origin:50% 0;background:linear-gradient(#6aa046,#2f5a22);clip-path:polygon(35% 0,65% 0,100% 30%,50% 100%,0 30%)}.cx i:nth-child(1){transform:rotate(-74deg)}.cx i:nth-child(2){transform:rotate(-37deg)}.cx i:nth-child(4){transform:rotate(37deg)}.cx i:nth-child(5){transform:rotate(74deg)}
+.sh{position:absolute;left:14%;right:14%;bottom:3%;height:9%;border-radius:50%;background:rgba(40,20,5,.4);filter:blur(12px)}
+.lf{position:absolute;width:26%;height:12%;background:linear-gradient(135deg,#7aa84a,#3c6a28);border-radius:0 90% 0 90%;transform:translate(calc(var(--px,0px)*-1.3),calc(var(--py,0px)*-1.3)) rotate(var(--r));z-index:2}.lf.a{left:0;top:22%;--r:-30deg}.lf.b{right:0;bottom:22%;--r:150deg;width:20%}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;perspective:900px}@media(max-width:800px){.steps{grid-template-columns:repeat(2,1fr)}}
+.stp{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px;cursor:pointer;transition:transform .25s,box-shadow .25s;box-shadow:0 12px 22px -16px rgba(60,35,10,.6)}.stp:hover{transform:translateY(-7px) rotateX(7deg);box-shadow:0 24px 26px -14px rgba(60,35,10,.55)}
+.stp i{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;font:800 15px Fraunces,Georgia,serif;margin-bottom:6px}.stp b{display:block}.stp span{font-size:13px;color:var(--mu)}
+.fine summary{cursor:pointer;font-weight:700;margin-top:12px}.fine summary:hover{color:var(--red)}
+
+#dp{position:fixed;inset:0;z-index:70;background:rgba(30,18,6,.8);color:#fff;display:grid;place-items:center;font:800 34px Fraunces,Georgia,serif;border:4px dashed #fff;margin:14px;border-radius:20px;inset:0;pointer-events:none}
+.tabs{display:flex;gap:6px;margin:10px 0;flex-wrap:wrap}.tabs button{font:inherit;font-weight:700;border:1px solid var(--ln);background:var(--paper);color:var(--ink);border-radius:99px;padding:5px 14px;cursor:pointer;transition:transform .15s}.tabs button:hover{transform:translateY(-2px)}.tabs button.on{background:var(--ink);color:var(--paper)}
+.tbl{width:100%;border-collapse:collapse}.tbl td{padding:6px 0;border-bottom:1px dashed var(--ln)}.tbl td:last-child{text-align:right;font-weight:700}
+.rm{position:relative;height:14px;border-radius:9px;background:linear-gradient(90deg,#2f7d32,#8aa83a 25%,#d9a21b 50%,#d9692b 75%,#7a2e4d);margin:14px 0 6px}.rm i{position:absolute;top:-5px;left:0;width:6px;height:24px;background:var(--ink);border-radius:3px;transform:translateX(-50%);transition:left .8s cubic-bezier(.3,1.4,.5,1)}
+.rl{display:flex;justify-content:space-between;font-size:11px;color:var(--mu)}.rep ul{padding-left:18px;margin:6px 0}.rep li{margin:4px 0}.tag{display:inline-block;border-radius:99px;padding:1px 12px;font-weight:700;color:#fff;font-size:13px}
+.tip{border-left:4px solid var(--red);background:var(--paper);border-radius:8px;padding:8px 12px;margin:8px 0}.tip b{display:block}
+.rb{display:flex;height:26px;border-radius:8px;overflow:hidden;gap:2px}.rb span{display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;min-width:20px}
+.ck{display:flex;gap:10px;background:var(--paper);border-radius:10px;padding:8px 12px;margin:6px 0;cursor:pointer;transition:opacity .2s}.ck input{accent-color:var(--red);width:18px;height:18px;flex:none;margin-top:3px}.ck em{color:var(--red);font-style:normal;font-size:12px;font-weight:700}.ck:has(input:checked){opacity:.5;text-decoration:line-through}
+.pgb{flex:1;min-width:80px;height:8px;background:var(--ln);border-radius:9px;overflow:hidden}.pgb u{display:block;height:100%;width:0;background:#2f7d32;transition:width .4s}
+
+#fx{position:fixed;inset:0;z-index:80;pointer-events:none}#sm{position:relative}#sm .stats{padding-right:96px}.b.g.sm.on{background:var(--ink);color:var(--paper)}
+.stamp{animation:stp .6s cubic-bezier(.3,1.6,.5,1)}@keyframes stp{from{transform:rotate(-70deg) scale(2.4);opacity:0}}
+.stage{transform-style:preserve-3d}.ring{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(-16deg);pointer-events:none}.orb{position:absolute;inset:0;transform-style:preserve-3d;animation:orb 14s linear infinite}
+.orb b{position:absolute;left:50%;top:48%;width:46px;height:46px;margin:-23px;border-radius:50%;background:var(--c);box-shadow:0 8px 14px rgba(0,0,0,.35),inset 0 -5px 8px rgba(0,0,0,.25),inset 0 4px 6px rgba(255,255,255,.3);transform:rotateY(calc(var(--k)*72deg)) translateZ(min(205px,38vw));transform-style:preserve-3d}
+.orb span{display:grid;place-items:center;width:100%;height:100%;color:#fff;font:800 16px Fraunces,Georgia,serif;animation:cr 14s linear infinite}
+@keyframes orb{to{transform:rotateY(360deg)}}@keyframes cr{from{transform:rotateY(calc(var(--k)*-72deg))}to{transform:rotateY(calc(var(--k)*-72deg - 360deg))}}
+.hero h2 u{display:inline-block}.fp{animation:fp .5s}@keyframes fp{from{transform:rotateX(90deg);opacity:0}}
+.dial{position:absolute;right:16px;top:12px;width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--red) calc(var(--p)*1%),var(--ln) 0);display:grid;place-items:center;transition:--p 1.2s}@property --p{syntax:'<number>';initial-value:0;inherits:false}.dial::after{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--card)}.dial b{position:relative;z-index:1;font:800 24px Fraunces,Georgia,serif}
+.hof{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}.hf{display:flex;gap:10px;align-items:center;border:2px solid;border-radius:12px;padding:6px 14px 6px 6px;cursor:pointer;transition:transform .2s}.hf:hover{transform:translateY(-3px) rotate(-1deg)}.hf canvas{width:46px;height:46px;border-radius:50%}
+</style></head><body><div id="bgw"><div class="sun"></div><div class="hill"></div><div class="field"></div></div>
+<header><div class="logo"><span class="mark"></span>AgriGrade<small>AI</small></div><nav class="nav" style="margin-left:auto"><a href="#dz">Scan</a><a href="#sm">Report</a><a href="#spc">Specimen</a></nav><button id="xr" class="b g sm">X-ray</button><button id="rn" class="b g sm">Tomato rain</button><button id="sd" class="b g sm">Sound off</button><button id="th" class="b g sm">Light / dark</button></header>
+<main><section class="hero"><div><span class="chip" style="display:inline-block;margin-bottom:12px">Farm-gate grading · runs right in your browser</span><h2>Know your <u>tomatoes</u> before the market does.</h2><p class="lead">Photograph a tray. Every fruit is checked for ripeness, colour, blemishes, shape and size, then sorted into crates with a grade and a price.</p><div class="row"><button class="b" id="hu">Upload a photo</button><button class="b g" id="hd">Try a demo tray</button></div><div class="chips"><span class="chip"><b id="cnt">0</b> graded this session</span><span class="chip"><b>5</b> checks per fruit</span><span class="chip"><b>Rot check</b> + harvest tips</span></div></div>
+<div><div class="stage" id="stg"><div class="ring"><div class="orb"><b style="--k:0;--c:#2f7d32"><span>A+</span></b><b style="--k:1;--c:#8aa83a"><span>A</span></b><b style="--k:2;--c:#d9a21b"><span>B</span></b><b style="--k:3;--c:#d9692b"><span>C</span></b><b style="--k:4;--c:#7a2e4d"><span>R</span></b></div></div><div class="lf a"></div><div class="lf b"></div><div class="sh"></div><div class="tmt" id="tmt"><div class="bd"></div><div class="gl"></div><div class="cx"><i></i><i></i><i></i><i></i><i></i></div></div></div><div style="text-align:center"><span class="mut">Move the mouse, click it, or slide to ripen · <b id="hl">Red</b></span><input type="range" id="hr" min="0" max="100" value="100" style="width:80%;accent-color:var(--red)"></div></div></section>
+<div class="steps"><div class="stp" data-t="#dz"><i>1</i><b>Drop a tray</b><span>Any photo on a plain background.</span></div><div class="stp" data-t="#rs"><i>2</i><b>Scan</b><span>Each fruit is outlined and measured.</span></div><div class="stp" data-t="#spc"><i>3</i><b>Inspect</b><span>Turn it in 3D and see every defect.</span></div><div class="stp" data-t="#sm"><i>4</i><b>Sort</b><span>Crates fill by grade, with prices.</span></div></div>
+<section class="card" id="dz"><div class="dzr"><div><h3>Scanner tray</h3><p class="mut" style="margin:4px 0 0">Drop photos, paste (Ctrl+V), browse or use the camera. Plain background, tomatoes not touching.</p></div><div class="row"><button class="b" id="bf">Upload photos</button><button class="b g" id="bc">Camera</button><button class="b g" id="bd">Demo batch</button></div></div><input type="file" id="fi" accept="image/*" multiple hidden>
+<details class="fine"><summary>Fine-tune the scanner</summary><div class="ctl"><label>Segmentation threshold <b id="Tv">80</b><input id="T" type="range" min="30" max="220" value="80"></label><label>Scene width, cm <b id="Sv">30</b><input id="S" type="range" min="10" max="80" value="30"></label><label>Grading strictness <b id="Kv">0</b><input id="K" type="range" min="-10" max="15" value="0"></label>
+<div><label><input type="checkbox" id="ov" checked> Colour overlay</label><label><input type="checkbox" id="df" checked> Defect marks</label><label><input type="checkbox" id="lb" checked> Tags on photo</label><label><input type="checkbox" id="hm"> X-ray heat-map</label></div></div></details></section>
+<div class="grid"><div style="display:grid;gap:16px;min-width:0"><section class="card" id="sm" hidden></section><section class="card" id="rep" hidden></section><div id="rs" style="display:grid;gap:16px"></div></div>
+<aside class="card sticky" id="spc"><h3>Specimen</h3><p class="mut" style="margin:2px 0 4px">Drag to turn it over. Defects are mapped from the photo.</p><canvas id="sv" width="260" height="260"></canvas><label class="mut"><input type="checkbox" id="au" checked> Slow turntable</label><div style="margin:8px 0"><span class="mut" id="rl">Pick a tomato</span><br><input type="range" id="rp" min="0" max="14" value="0"></div><div id="si"></div></aside></div></main>
+<canvas id="fx"></canvas><div id="dp" hidden>Drop photos anywhere to grade them</div><div class="md" id="md" hidden><div class="mb" id="mb"></div></div><div id="tip" hidden></div><div id="toast" hidden></div><script>const $=s=>document.querySelector(s),cl=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const G=[['A+',85,'#2f7d32',80],['A',72,'#8aa83a',60],['B',58,'#d9a21b',40],['C',42,'#d9692b',25],['Reject',0,'#7a2e4d',5]];
+const ST=[[.1,'Green'],[.3,'Breaker'],[.5,'Turning'],[.7,'Pink'],[.88,'Light red'],[2,'Red']];
+const NM={col:'colour / ripeness',def:'surface defects',shp:'shape',uni:'colour uniformity',siz:'size'};
+const ADV={col:'sort by ripeness stage and adjust harvest timing',def:'review handling, packing and storage',shp:'review variety and growing conditions',uni:'ripen under controlled ethylene',siz:'add size-grading rollers'};
+let items=[],FIL=null,SEL=null,SPr=null;const cfg=()=>({T:+$('#T').value,S:+$('#S').value,K:+$('#K').value,ov:$('#ov').checked,df:$('#df').checked,lb:$('#lb').checked}),vl=r=>r.wg/1000*G[r.g][3];
+function hsv(r,g,b){const m=Math.max(r,g,b),n=Math.min(r,g,b),d=m-n;let h=0;if(d){h=m==r?((g-b)/d+6)%6:m==g?(b-r)/d+2:(r-g)/d+4;h*=60}return[h,m?d/m:0,m/255]}
+function analyze(cv,c){
+ const W=cv.width,H=cv.height,N=W*H,D=cv.getContext('2d').getImageData(0,0,W,H).data,mpp=c.S*10/W;
+ const br=[[],[],[]],pb=(x,y)=>{const i=(y*W+x)*4;for(let k=0;k<3;k++)br[k].push(D[i+k])};
+ for(let x=0;x<W;x+=3){pb(x,0);pb(x,H-1)}for(let y=0;y<H;y+=3){pb(0,y);pb(W-1,y)}
+ const bg=br.map(a=>a.sort((p,q)=>p-q)[a.length>>1]),fg=new Uint8Array(N);
+ for(let p=0;p<N;p++){const i=p*4;fg[p]=Math.abs(D[i]-bg[0])+Math.abs(D[i+1]-bg[1])+Math.abs(D[i+2]-bg[2])>c.T}
+ const lab=new Uint8Array(N),st=new Int32Array(N),cs=[];
+ for(let s=0;s<N;s++){if(!fg[s]||lab[s])continue;const rn=new Int32Array(H).fill(W),rx=new Int32Array(H).fill(-1);let sp=0,n=0,q;st[sp++]=s;lab[s]=1;
+  while(sp){const p=st[--sp],x=p%W,y=(p/W)|0;n++;if(x<rn[y])rn[y]=x;if(x>rx[y])rx[y]=x;
+   if(x>0&&fg[q=p-1]&&!lab[q]){lab[q]=1;st[sp++]=q}if(x<W-1&&fg[q=p+1]&&!lab[q]){lab[q]=1;st[sp++]=q}
+   if(y>0&&fg[q=p-W]&&!lab[q]){lab[q]=1;st[sp++]=q}if(y<H-1&&fg[q=p+W]&&!lab[q]){lab[q]=1;st[sp++]=q}}
+  if(n>=Math.max(600,N*.006))cs.push({rn,rx})}
+ const res=[],mk=new Uint8Array(N),hh=new Array(36).fill(0);
+ cs.slice(0,40).forEach(o=>{
+  const px=[];let sx=0,sy=0;for(let y=0;y<H;y++)for(let x=o.rn[y];x<=o.rx[y];x++){px.push(y*W+x);sx+=x;sy+=y}
+  const n=px.length,cx=sx/n,cy=sy/n;let a=0,b=0,e=0,x0=W,x1=0,y0=H,y1=0;
+  for(const p of px){const x=p%W,y=(p/W)|0,u=x-cx,v=y-cy;a+=u*u;b+=u*v;e+=v*v;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;mk[p]=1}
+  a/=n;b/=n;e/=n;const tr=(a+e)/2,sq=Math.sqrt(Math.max(0,tr*tr-(a*e-b*b))),rd=Math.sqrt(Math.max(tr-sq,.01)/(tr+sq)),R=Math.sqrt(n/Math.PI);
+  const hb=new Array(36).fill(0),HS=new Float32Array(n*3);
+  px.forEach((p,k)=>{const i=p*4,h=hsv(D[i],D[i+1],D[i+2]);HS[k*3]=h[0];HS[k*3+1]=h[1];HS[k*3+2]=h[2];if(h[1]>.2&&h[2]>.15){const bi=Math.min(35,h[0]/10|0);hb[bi]++;hh[bi]++}});
+  const dom=hb.indexOf(Math.max(...hb))*10+5;let sS=0,cS=0,vS=0,m=0;
+  for(let k=0;k<n;k++){const h=HS[k*3];if(HS[k*3+1]>.2&&HS[k*3+2]>.15&&Math.abs(((h-dom+540)%360)-180)<=40){sS+=Math.sin(h*Math.PI/180);cS+=Math.cos(h*Math.PI/180);vS+=HS[k*3+2];m++}}
+  m=m||1;const mh=(Math.atan2(sS,cS)*180/Math.PI+360)%360,mv=vS/m;let vr=0;
+  for(let k=0;k<n;k++){if(HS[k*3+1]>.2){const d=((HS[k*3]-mh+540)%360)-180;if(Math.abs(d)<=40)vr+=d*d}}
+  const sd=Math.sqrt(vr/m),cell=new Map();let dk=0;
+  px.forEach((p,k)=>{const x=p%W,y=(p/W)|0;if((x-cx)**2+(y-cy)**2<(.88*R)**2&&HS[k*3+2]<.5*mv){dk++;const key=((y/6)|0)*200+((x/6)|0);cell.set(key,(cell.get(key)||0)+1)}});
+  const fs=new Set([...cell].filter(z=>z[1]>=12).map(z=>z[0])),defs=[];
+  for(const k0 of [...fs]){if(!fs.delete(k0))continue;const q=[k0];let ax=0,ay=0,cn=0;
+   while(q.length){const k=q.pop();ax+=k%200;ay+=(k/200)|0;cn++;for(const d of[-201,-200,-199,-1,1,199,200,201])if(fs.delete(k+d))q.push(k+d)}
+   defs.push({x:(ax/cn+.5)*6,y:(ay/cn+.5)*6,r:Math.sqrt(cn*36/Math.PI)+6})}
+  const hr=mh>180?mh-360:mh,rip=cl(1-Math.max(hr,0)/80),over=mv<.45&&rip>.8,dMm=2*R*mpp,dp=dk/n;
+  const s={col:cl((rip>=.8?1:rip/.8)*(over?.6:1)),uni:cl(1-sd/22),def:cl(1-dp*14-Math.min(defs.length*.04,.3)),shp:cl((rd-.55)/.4),siz:cl(dMm<55?dMm/55:dMm>85?1-(dMm-85)/60:1)};
+  const score=Math.round(100*(.3*s.col+.3*s.def+.15*s.shp+.15*s.uni+.1*s.siz)),gi=G.findIndex(g=>score>=(g[1]?g[1]+c.K:0));
+  const wg=.5*(dMm/10)**3;
+  res.push({cx,cy,x0,x1,y0,y1,n,rip,over,stage:ST.find(z=>rip<z[0])[1],mh,mv,sd,rd,dMm,wg,defs,dp,s,score,g:gi,shelf:over?1:Math.round(3+11*(1-rip)),
+   use:gi<2?(rip<.5?'Ship & ripen':'Premium retail'):gi==2?'Restaurants / salads':gi==3?'Sauce & purée':'Compost / biogas',val:wg/1000*G[gi][3],px})});
+ res.sort((p,q)=>Math.round(p.cy/(H/4))-Math.round(q.cy/(H/4))||p.cx-q.cx);
+ const oc=document.createElement('canvas');oc.width=W;oc.height=H;const ox=oc.getContext('2d'),od=ox.createImageData(W,H),O=od.data;
+ res.forEach(r=>{const v=parseInt(G[r.g][2].slice(1),16);for(const p of r.px){const i=p*4,e=!mk[p-1]||!mk[p+1]||!mk[p-W]||!mk[p+W];O[i]=v>>16;O[i+1]=v>>8&255;O[i+2]=v&255;O[i+3]=e?255:80}delete r.px});
+ ox.putImageData(od,0,0);return{res,ov:oc,hh}}
+function fit(img,w,h){const s=Math.min(1,720/Math.max(w,h)),k=document.createElement('canvas');k.width=Math.round(w*s);k.height=Math.round(h*s);k.getContext('2d').drawImage(img,0,0,k.width,k.height);return k}
+function tomato(x,r,h,s,l,o={}){x.save();x.translate(o.x,o.y);x.rotate(o.rot||0);x.scale(1,o.sq||1);
+ const g=x.createRadialGradient(-.3*r,-.3*r,r*.1,0,0,r);g.addColorStop(0,`hsl(${h} ${s}% ${l+13}%)`);g.addColorStop(.7,`hsl(${h} ${s}% ${l}%)`);g.addColorStop(1,`hsl(${h} ${s}% ${l-9}%)`);
+ x.fillStyle=g;x.beginPath();x.arc(0,0,r,0,7);x.fill();x.fillStyle='rgba(255,255,255,.45)';x.beginPath();x.ellipse(-.38*r,-.42*r,r*.16,r*.09,-.6,0,7);x.fill();
+ x.fillStyle='hsl(105 50% 28%)';x.beginPath();for(let k=0;k<12;k++){const a=k*Math.PI/6,d=k%2?.1*r:.34*r;x.lineTo(Math.cos(a)*d,Math.sin(a)*d-.08*r)}x.fill();
+ for(let k=0;k<(o.sp||0);k++){const a=Math.random()*6.28,d=Math.random()*.6*r;x.fillStyle='rgba(45,22,12,.92)';x.beginPath();x.arc(Math.cos(a)*d,Math.sin(a)*d,3+Math.random()*5,0,7);x.fill()}x.restore()}
+function demo(mixed){const cv=document.createElement('canvas');cv.width=720;cv.height=480;const x=cv.getContext('2d');x.fillStyle='#ebe7df';x.fillRect(0,0,720,480);
+ const M=[[4,78,45,1,0],[95,45,40,1,0],[22,85,50,1,0],[355,60,28,.9,4],[6,75,44,1,6],[8,80,48,.72,0]],rnd=Math.random;
+ for(let i=0;i<6;i++){const p=mixed?M[i]:[rnd()<.15?95:Math.round(rnd()*30),70+rnd()*15,40+rnd()*10,.8+rnd()*.2,rnd()<.4?Math.round(rnd()*6):0];
+  tomato(x,mixed?78:55+rnd()*28,p[0],p[1],p[2],{x:120+240*(i%3),y:125+225*((i/3)|0),sq:p[3],sp:p[4],rot:rnd()*3});}
+ items.push({name:mixed?'demo_mixed_batch.png':'demo_random_batch.png',src:cv})}
+
+function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600)}
+let onC=null;function modal(n,cb){$('#mb').replaceChildren(n);$('#md').hidden=false;onC=cb}function closeM(){$('#md').hidden=true;if(onC)onC();onC=null}$('#md').onclick=e=>{if(e.target.id=='md')closeM()};
+const hl=(h,s,l)=>{h=(h%360+360)%360;const a=s*Math.min(l,1-l),f=n=>{const k=(n+h/30)%12;return(l-a*Math.max(-1,Math.min(k-3,9-k,1)))*255};return[f(0),f(8),f(4)]};
+const SP={yaw:.6,pit:.5,vy:0,vp:0,drag:false,hue:6,l:.42,spots:[]},off=document.createElement('canvas');
+const LL=(()=>{const l=[-.45,.55,.7],n=Math.hypot(...l);return l.map(v=>v/n)})(),HH=(()=>{const l=[LL[0],LL[1],LL[2]+1],n=Math.hypot(...l);return l.map(v=>v/n)})();
+function rend(){const cv=$('#sv'),W=260,x=cv.getContext('2d');off.width=off.height=W;const o=off.getContext('2d'),im=o.createImageData(W,W),D=im.data,R=W*.4,cp=Math.cos(SP.pit),sp=Math.sin(SP.pit),cy=Math.cos(SP.yaw),sy=Math.sin(SP.yaw),base=hl(SP.hue,.72,SP.l),gr=hl(100,.5,.26);
+ for(let py=0;py<W;py++)for(let px=0;px<W;px++){const u=(px-W/2)/R,v=-(py-W*.5)/R,q=v/.88,zz=1-u*u-q*q;if(zz<0)continue;const z=Math.sqrt(zz);let nx=u,ny=v/.7744,nz=z;const nl=Math.hypot(nx,ny,nz);nx/=nl;ny/=nl;nz/=nl;
+  const y1=q*cp-z*sp,z1=q*sp+z*cp,x2=u*cy+z1*sy,z2=-u*sy+z1*cy;let c=base,gl=1;
+  if(y1>.78&&Math.cos(5*Math.atan2(z2,x2))>.15-(y1-.78)*2.5||y1>.95){c=gr;gl=.3}
+  for(const s of SP.spots){const d=Math.hypot(x2-s[0],y1-s[1],z2-s[2]);if(d<.2){const t=cl(1-d/.2)**.6;c=[c[0]*(1-t)+50*t,c[1]*(1-t)+26*t,c[2]*(1-t)+12*t];gl=.2}}
+  const df=Math.max(0,nx*LL[0]+ny*LL[1]+nz*LL[2]),sc=Math.pow(Math.max(0,nx*HH[0]+ny*HH[1]+nz*HH[2]),50)*.55*gl,k=(.36+.78*df)*(1-Math.pow(1-nz,3)*.4),g=Math.sin(x2*40)*Math.sin(y1*37)*Math.sin(z2*41)*7,i=(py*W+px)*4;
+  D[i]=cl(c[0]*k+g+255*sc,0,255);D[i+1]=cl(c[1]*k+g+255*sc,0,255);D[i+2]=cl(c[2]*k+g+255*sc,0,255);D[i+3]=255}
+ o.putImageData(im,0,0);x.clearRect(0,0,W,W);x.fillStyle='rgba(40,25,10,.28)';x.beginPath();x.ellipse(W/2,W*.9,R*.75,R*.11,0,0,7);x.fill();x.drawImage(off,0,0)}
+(function lp(){if(!SP.drag){if($('#au').checked)SP.yaw+=.01;SP.yaw+=SP.vy;SP.vy*=.94;SP.pit=cl(SP.pit+SP.vp,-1.2,1.2);SP.vp*=.9}rend();requestAnimationFrame(lp)})();
+{const sv=$('#sv');let lx,ly;sv.onpointerdown=e=>{SP.drag=true;lx=e.clientX;ly=e.clientY;sv.setPointerCapture(e.pointerId)};sv.onpointermove=e=>{if(!SP.drag)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;SP.yaw+=dx*.012;SP.pit=cl(SP.pit+dy*.01,-1.2,1.2);SP.vy=dx*.002};sv.onpointerup=()=>SP.drag=false}
+function setSpec(r){SPr=r;const Rr=Math.sqrt(r.n/Math.PI);SP.spots=r.defs.map(d=>{const u=(d.x-r.cx)/Rr,v=-(d.y-r.cy)/Rr;return[u,Math.sqrt(Math.max(0,1-u*u-v*v)),-v]});$('#rp').value=0;ripen();info()}
+function ripen(){const r=SPr;if(!r)return;const d=+$('#rp').value,h0=r.mh>180?r.mh-360:r.mh,h=d?Math.max(3,h0-d*5):r.mh,rp=cl(1-Math.max(h,0)/80);SP.hue=h;SP.l=cl(.14+r.mv*.4)*(d>r.shelf?Math.max(.55,1-(d-r.shelf)*.08):1);$('#rl').textContent=d?`Day +${d}: ${ST.find(z=>rp<z[0])[1]}${d>r.shelf?' · past its prime':''}`:'Today: '+r.stage+' · slide to forecast ripening'}
+$('#rp').oninput=ripen;
+const bar=(l,v)=>`<div class="br"><span>${l}</span><i><u style="width:${v*100|0}%;background:${v>.7?'#2f7d32':v>.45?'#d9a21b':'#b3402a'}"></u></i></div>`;
+function info(){const r=SPr,g=G[r.g];$('#si').innerHTML=`<div style="display:flex;gap:12px;align-items:center"><div class="stamp" style="color:${g[2]}">${g[0]}</div><div><span class="sc">${r.score}</span> <span class="mut">/ 100${r.man?' · manual':''}</span><div class="mut">${r.stage}${r.over?' (overripe)':''} · ${r.use}</div></div></div>${bar('Colour',r.s.col)}${bar('Defects',r.s.def)}${bar('Shape',r.s.shp)}${bar('Uniform',r.s.uni)}${bar('Size',r.s.siz)}<p class="fx">⌀ ${r.dMm|0} mm · ${r.wg|0} g · ${r.defs.length} spot(s) · ${r.shelf} days left · ₹${vl(r).toFixed(1)}</p><span class="mut">Override grade:</span><div class="row" style="margin-top:4px">${G.map((x,k)=>`<button class="b g sm" data-o="${k}" style="border-bottom-color:${x[2]}">${x[0]}</button>`).join('')}</div>`}
+function paint(it,c){const v=it.cvs,x=v.getContext('2d');v.width=it.src.width;v.height=it.src.height;const sh=(r,j)=>(FIL==null||r.g==FIL)&&(it.sel==null||it.sel==j),dim=it.res.some((r,j)=>!sh(r,j));if($('#hm').checked)heat(x,it);else{x.drawImage(it.src,0,0);if(c.ov)x.drawImage(it.ov,0,0)}
+ if(dim){x.fillStyle='rgba(30,18,6,.58)';x.fillRect(0,0,v.width,v.height);it.res.forEach((r,j)=>{if(!sh(r,j))return;const a=Math.max(0,r.x0-8),b=Math.max(0,r.y0-8),w=r.x1-r.x0+16,h=r.y1-r.y0+16;x.drawImage(it.src,a,b,w,h,a,b,w,h);if(c.ov)x.drawImage(it.ov,a,b,w,h,a,b,w,h)})}
+ it.res.forEach((r,i)=>{if(!sh(r,i))return;const gc=G[r.g][2];
+  if(c.df)r.defs.forEach(d=>{x.strokeStyle='#e8321e';x.lineWidth=2.5;x.beginPath();x.arc(d.x,d.y,d.r,0,7);x.stroke()});
+  x.strokeStyle=gc;x.lineWidth=3;const L=16,pd=6;[[r.x0,r.y0,1,1],[r.x1,r.y0,-1,1],[r.x0,r.y1,1,-1],[r.x1,r.y1,-1,-1]].forEach(([a,b,sx,sy])=>{x.beginPath();x.moveTo(a-sx*pd,b-sy*pd+sy*L);x.lineTo(a-sx*pd,b-sy*pd);x.lineTo(a-sx*pd+sx*L,b-sy*pd);x.stroke()});
+  if(c.lb){const t=`#${i+1}  ${G[r.g][0]}  ${r.score}`;x.font='bold 14px system-ui,sans-serif';const w=x.measureText(t).width+16,lx=Math.max(2,Math.min(v.width-w-2,r.cx-w/2)),ly=r.y0-34<2?r.y1+12:r.y0-34;
+   x.fillStyle='#fffaf0';x.beginPath();x.roundRect(lx,ly,w,24,6);x.fill();x.strokeStyle=gc;x.lineWidth=2;x.stroke();x.fillStyle='#2b2418';x.fillText(t,lx+8,ly+17)}})}
+function draw(){const c=cfg(),rs=$('#rs');rs.replaceChildren();
+ items.forEach((it,i)=>{const s=document.createElement('section');s.className='card';s.dataset.i=i;
+  s.innerHTML=`<div class="ih"><h3>${it.name}</h3><span class="mut">${it.res.length} tomato${it.res.length==1?'':'es'}</span><span class="fl"></span><button class="b g sm" data-v="${i}">Full image</button><button class="b g sm" data-x="${i}">Remove</button></div><div class="ib"><div class="cw"><canvas class="bs"></canvas><canvas class="a"></canvas></div><div class="tl"></div></div>`;
+  rs.append(s);const bs=s.querySelector('.bs');bs.width=it.src.width;bs.height=it.src.height;bs.getContext('2d').drawImage(it.src,0,0);it.bs=bs;it.cvs=s.querySelector('.a');paint(it,c);
+  if(it.fresh){it.fresh=false;const w=s.querySelector('.cw');w.classList.add('lz');setTimeout(()=>w.classList.remove('lz'),2000)}
+  const tl=s.querySelector('.tl');if(!it.res.length)tl.innerHTML='<p class="mut">No tomatoes found. Lower the threshold or use a plainer background.</p>';
+  it.res.forEach((r,j)=>{const g=G[r.g],d=document.createElement('div');d.className='tc';d.dataset.k=i+'-'+j;d.dataset.g=r.g;d.style.setProperty('--g',g[2]);if(FIL!=null&&FIL!=r.g)d.style.display='none';
+   d.innerHTML=`<div class="th"></div><div class="tb"><b>#${j+1}</b> <span class="sc">${r.score}</span> <b style="color:${g[2]}">${g[0]}</b><div class="fx">${r.stage} · ${r.dMm|0} mm · ${r.defs.length} spot(s) · ${rotOf(r).n} · ₹${vl(r).toFixed(1)}</div></div>`;
+   const k=document.createElement('canvas');k.width=k.height=60;const z=Math.max(r.x1-r.x0,r.y1-r.y0)*1.2;k.getContext('2d').drawImage(bs,r.cx-z/2,r.cy-z/2,z,z,0,0,60,60);d.querySelector('.th').append(k);tl.append(d)})});
+ summary();if(SEL&&items[SEL[0]]&&items[SEL[0]].res[SEL[1]])pick(SEL[0],SEL[1]);else{SEL=null;if(items[0]&&items[0].res[0])pick(0,0)}}
+function pick(i,j){items.forEach((it,k)=>it.sel=k==i?j:null);SEL=[i,j];const c=cfg();items.forEach(it=>paint(it,c));document.querySelectorAll('.tc').forEach(e=>e.classList.toggle('sel',e.dataset.k==i+'-'+j));setSpec(items[i].res[j])}
+function applyF(){const c=cfg();items.forEach(it=>paint(it,c));document.querySelectorAll('.tc').forEach(e=>e.style.display=FIL!=null&&+e.dataset.g!=FIL?'none':'');document.querySelectorAll('.cr').forEach(e=>e.classList.toggle('on',+e.dataset.f===FIL))}
+const hist=()=>{try{return JSON.parse(localStorage.getItem('tv')||'[]')}catch(e){return[]}};
+function summary(){const all=items.flatMap(i=>i.res),sm=$('#sm');if(!all.length){sm.hidden=true;return}sm.hidden=false;
+ const n=all.length,avg=Math.round(all.reduce((a,r)=>a+r.score,0)/n),cnt=G.map((g,i)=>all.filter(r=>r.g==i).length),kg=all.reduce((a,r)=>a+r.wg,0)/1000,val=all.reduce((a,r)=>a+vl(r),0),prem=Math.round((cnt[0]+cnt[1])/n*100),fa=Object.keys(NM),av=fa.map(k=>all.reduce((a,r)=>a+r.s[k],0)/n),wk=av.indexOf(Math.min(...av));
+ sm.innerHTML=`<h3>Today’s lot</h3><div class="stats"><span><b>${n}</b>tomatoes</span><span><b>${avg}</b>avg score</span><span><b>${prem}%</b>premium</span><span><b>${kg.toFixed(2)}</b>kg</span><span><b>₹${val.toFixed(0)}</b>est. value</span></div><p class="mut" style="margin:0">Tap a crate to filter. Tap a tomato in a photo to inspect it in 3D.</p>
+ <div class="crates">${G.map((g,i)=>`<div class="cr${FIL==i?' on':''}" data-f="${i}"><div class="top">${all.filter(r=>r.g==i).slice(0,36).map(r=>`<i class="tm" style="background:hsl(${r.mh|0} 70% ${20+r.mv*28|0}%)"></i>`).join('')}</div><div class="fr"><span style="color:${g[2]}">●</span> ${g[0]} · ${cnt[i]}<br>₹<input class="pr" type="number" min="0" data-p="${i}" value="${g[3]}">/kg</div></div>`).join('')}</div>
+ <p class="ins"><b>Reading:</b> weakest factor is ${NM[fa[wk]]} (avg ${av[wk]*100|0}%) – ${ADV[fa[wk]]}.</p><div class="row"><button class="b" id="csv">CSV report</button><button class="b g" id="sv2">Save run</button></div><p id="hs" class="mut"></p>`;
+ const h=hist();$('#hs').textContent=h.length?'History: '+h.map(x=>`${x.t}: ${x.n} tomatoes, avg ${x.a}`).join(' · '):'';
+ $('#csv').onclick=()=>{const rows=[['image','id','grade','score','stage','diameter_mm','weight_g','roundness','defect_spots','shelf_days','use','value_inr','rot_index','rot_level']];items.forEach(it=>it.res.forEach((r,j)=>rows.push([it.name,j+1,G[r.g][0],r.score,r.stage,r.dMm.toFixed(1),r.wg.toFixed(0),r.rd.toFixed(2),r.defs.length,r.shelf,r.use,vl(r).toFixed(2),rotOf(r).x,rotOf(r).n])));
+  const w=document.createElement('div'),t=document.createElement('textarea'),b=document.createElement('button');t.value=rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');b.className='b';b.textContent='Copy CSV';b.onclick=()=>{t.select();document.execCommand('copy');toast('Copied – paste into Excel or Sheets')};w.append(t,b);modal(w)};
+ $('#sv2').onclick=()=>{try{const x=hist();x.push({t:new Date().toLocaleString(),n,a:avg});localStorage.setItem('tv',JSON.stringify(x.slice(-5)));summary();toast('Run saved')}catch(e){toast('Storage unavailable')}}}
+function run(force){const c=cfg();items.forEach(it=>{if(force||!it.res){const o=analyze(it.src,c);it.res=o.res;it.ov=o.ov;it.hh=o.hh;it.fresh=!force}});draw()}
+async function addFiles(fs){for(const f of fs){if(!f.type.startsWith('image/'))continue;try{const b=await createImageBitmap(f);items.push({name:(f.name||'pasted.png').replace(/[<>&"]/g,''),src:fit(b,b.width,b.height)})}catch(e){toast('Could not read '+f.name)}}run()}
+$('#bd').onclick=()=>{demo(true);demo(false);run()};$('#bf').onclick=()=>$('#fi').click();$('#fi').onchange=e=>addFiles(e.target.files);
+const dz=$('#dz');['dragover','dragenter'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.add('dz-on')}));['dragleave','drop'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.remove('dz-on')}));dz.addEventListener('drop',e=>addFiles(e.dataTransfer.files));addEventListener('paste',e=>addFiles([...e.clipboardData.files]));
+$('#bc').onclick=async()=>{try{const sm=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}),v=document.createElement('video');v.srcObject=sm;v.autoplay=true;v.playsInline=true;v.muted=true;v.style.maxWidth='100%';const b=document.createElement('button'),w=document.createElement('div');b.className='b';b.textContent='Capture';w.append(v,document.createElement('br'),b);modal(w,()=>sm.getTracks().forEach(t=>t.stop()));b.onclick=()=>{items.push({name:'camera_'+Date.now()+'.png',src:fit(v,v.videoWidth,v.videoHeight)});closeM();run()}}catch(e){toast('Camera unavailable here – upload a photo instead')}};
+let deb;['T','S','K'].forEach(id=>$('#'+id).oninput=()=>{$('#'+id+'v').textContent=$('#'+id).value;clearTimeout(deb);deb=setTimeout(()=>run(true),150)});['ov','df','lb'].forEach(id=>$('#'+id).onchange=draw);
+$('#th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark'};
+function hit(e){const cv=e.target.closest&&e.target.closest('canvas.a');if(!cv)return null;const b=cv.getBoundingClientRect(),px=(e.clientX-b.left)*cv.width/b.width,py=(e.clientY-b.top)*cv.height/b.height,i=+cv.closest('section').dataset.i;return[i,items[i].res.findIndex(r=>((px-r.cx)/((r.x1-r.x0)/2))**2+((py-r.cy)/((r.y1-r.y0)/2))**2<=1)]}
+$('#rs').addEventListener('pointermove',e=>{const h=hit(e),t=$('#tip');if(!h||h[1]<0){t.hidden=true;return}const r=items[h[0]].res[h[1]];t.hidden=false;t.textContent=`#${h[1]+1} · ${G[r.g][0]} · ${r.score} · ${r.dMm|0} mm · ${r.stage}`;t.style.left=e.clientX+14+'px';t.style.top=e.clientY+14+'px'});
+$('#rs').addEventListener('pointerleave',()=>$('#tip').hidden=true);
+document.addEventListener('click',e=>{const T=e.target,h=hit(e),v=T.closest('[data-v]'),x=T.closest('[data-x]'),f=T.closest('[data-f]'),tc=T.closest('.tc'),o=T.closest('[data-o]');
+ if(h){if(h[1]>=0)pick(h[0],h[1]);else{items[h[0]].sel=null;paint(items[h[0]],cfg())}return}
+ if(tc){const[i,j]=tc.dataset.k.split('-');pick(+i,+j)}
+ if(o&&SPr){SPr.g=+o.dataset.o;SPr.man=1;draw()}
+ if(x){items.splice(+x.dataset.x,1);draw()}
+ if(f&&!T.closest('input')){const k=+f.dataset.f;FIL=FIL===k?null:k;applyF()}
+ if(v){const it=items[+v.dataset.v],w=document.createElement('div'),im=new Image(),p=document.createElement('p');im.src=it.cvs.toDataURL('image/png');p.className='mut';p.textContent='Annotated output – right-click or long-press the image to save it.';w.append(im,p);modal(w)}});
+document.addEventListener('change',e=>{if(e.target.dataset.p!=null){G[+e.target.dataset.p][3]=+e.target.value||0;draw()}});
+addEventListener('keydown',e=>{if(!SEL||e.target.tagName=='INPUT'||!/Arrow(Left|Right)/.test(e.key))return;const fl=items.flatMap((it,i)=>it.res.map((r,j)=>[i,j])),k=fl.findIndex(z=>z[0]==SEL[0]&&z[1]==SEL[1]),n=fl[(k+(e.key=='ArrowRight'?1:-1)+fl.length)%fl.length];pick(...n)});
+addEventListener('pointermove',e=>$('#bgw').style.setProperty('--mx',(e.clientX/innerWidth-.5).toFixed(2)));
+
+{const stg=$('#stg'),tm=$('#tmt');
+addEventListener('pointermove',e=>{const b=stg.getBoundingClientRect(),dx=(e.clientX-b.left-b.width/2)/innerWidth,dy=(e.clientY-b.top-b.height/2)/innerHeight;tm.style.setProperty('--ry',dx*70+'deg');tm.style.setProperty('--rx',-dy*50+'deg');stg.style.setProperty('--px',dx*45+'px');stg.style.setProperty('--py',dy*35+'px')});
+stg.onclick=()=>{stg.classList.remove('bump');void stg.offsetWidth;stg.classList.add('bump')};
+$('#hr').oninput=()=>{const p=$('#hr').value/100;stg.style.setProperty('--h',4+(1-p)*90);$('#hl').textContent=ST.find(z=>p<z[0])[1]}}
+$('#hu').onclick=()=>$('#fi').click();$('#hd').onclick=()=>{items=[];FIL=null;SEL=null;$('#bd').click();setTimeout(()=>$('#sm').scrollIntoView({behavior:'smooth',block:'start'}),300)};
+$('#fi').addEventListener('change',()=>setTimeout(()=>$('#sm').scrollIntoView({behavior:'smooth'}),500));
+document.querySelectorAll('.stp').forEach(e=>e.onclick=()=>{const t=document.querySelector(e.dataset.t);if(t&&!t.hidden)t.scrollIntoView({behavior:'smooth',block:'start'})});
+document.querySelectorAll('.nav a').forEach(a=>a.onclick=e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t&&!t.hidden)t.scrollIntoView({behavior:'smooth'})});
+{const cn=$('#cnt');let c0=0;const _s=summary;summary=function(){_s();const n=items.reduce((a,i)=>a+i.res.length,0),a=c0,t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/700);cn.textContent=Math.round(a+(n-a)*k);if(k<1)requestAnimationFrame(f);else c0=n})(t0)}}
+const RL=[[15,'Fresh','#2f7d32'],[35,'Early spoilage','#8aa83a'],[60,'Moderately rotten','#d9a21b'],[80,'Heavily rotten','#d9692b'],[101,'Fully rotten','#7a2e4d']];
+const USE=[['Sell fresh as slicing or salad tomatoes, or retail display','Best price. Keep at 12–15 °C, unwashed, stem side up'],
+['Cut away the marked spots, then make salsa, sauce, soup, ketchup, tomato rice or curry gravy','Cook within a day and keep cut fruit chilled'],
+['Cook thoroughly only: pasta sauce or purée (cut out soft or black parts first), chutney, ketchup base, or sun-dried slices from the sound parts','Do not eat raw. Throw out any piece with mould or a sour, fermented smell'],
+['Compost or vermicompost, bokashi, fermented “tomato tea” fertiliser, or biogas feedstock. Save seed only if the plant had no disease','Not safe to eat. Wash hands after handling'],
+['Hot compost (60 °C or more), biogas digester, or deep burial away from the field','If blight or mould was visible, do not use a cool compost pile. Bury or burn it so spores do not return']];
+const GN=['Premium','Good','Fair','Processing','Reject'];
+function rotOf(r){const x=Math.round(cl(r.dp*7+(r.over?.35:0)+(1-r.s.uni)*.2+(r.mv<.4?(.4-r.mv)*1.2:0)+Math.min(r.defs.length*.05,.25))*100),l=RL.findIndex(z=>x<z[0]);return{x,l,n:RL[l][1],c:RL[l][2],un:r.rip<.5&&x<35}}
+function tips(r){const t=[],R=rotOf(r);
+ if(r.dp>.015||r.defs.length>1)t.push(['Dark spots and blemishes','Spray copper-based or recommended fungicide at the first sign of blight, water at the base (drip) not on leaves, remove infected lower leaves, and rotate crops every 2–3 seasons']);
+ if(r.defs.length>0&&r.dp>.01)t.push(['Blossom-end rot and bruising','Keep soil moisture even, mulch the beds, add calcium (gypsum or calcium nitrate), and pick into padded crates no more than 3 layers deep']);
+ if(R.x>=35||r.over)t.push(['Overripe or rotting fruit','Pick at breaker or turning stage, harvest every 2–3 days, never leave fallen fruit in the field, and cool to 12–15 °C straight after picking']);
+ if(r.s.uni<.6)t.push(['Uneven colour','Use shade net above 32 °C, keep potassium balanced, and harvest at breaker stage so fruit ripens evenly after picking']);
+ if(r.s.shp<.6)t.push(['Misshapen fruit','Improve pollination (gentle shaking, avoid very hot or humid spells), correct boron, and avoid excess nitrogen']);
+ if(r.s.siz<.6)t.push(['Small or oversized fruit','Prune suckers, thin clusters to 4–5 fruits, and keep irrigation and fertiliser steady through fruit set']);
+ if(r.rip<.5)t.push(['Picked too green','Wait for breaker stage on the vine unless shipping far, and tag plants that are ripe-ready']);
+ if(!t.length)t.push(['Nothing to fix','Keep the same irrigation, feeding and harvest timing, and record this plot as your benchmark']);return t}
+let TAB=0,REP=null;
+function report(i,j){REP=[i,j];const r=items[i].res[j],R=rotOf(r),g=G[r.g],e=$('#rep');e.hidden=false;e.className='card rep';
+ const u=R.un?['Ripen in a paper bag at room temperature for 3–7 days, or make fried green tomatoes, green chutney or pickles','Not rotten, just early. Do not refrigerate']:USE[R.l],safe=R.l<2?'Safe to eat after trimming any spots':R.l==2?'Cook only. Not for raw eating':'Do not eat';
+ const verdict=`Grade ${g[0]} (${GN[r.g]}), ${r.score}/100. A ${r.stage.toLowerCase()} tomato, ${r.dMm|0} mm, ${r.defs.length?r.defs.length+' defect spot'+(r.defs.length>1?'s':''):'no visible defects'}, ${r.rd>.85?'round':'slightly uneven'}. Rot: ${R.n.toLowerCase()}.`;
+ const row=(a,b)=>`<tr><td>${a}</td><td>${b}</td></tr>`;let h;
+ if(TAB==0)h=`<div style="display:flex;gap:14px;align-items:center"><div class="stamp" style="color:${g[2]}">${g[0]}</div><p style="margin:0">${verdict}</p></div><table class="tbl">${row('Ripeness stage',r.stage+(r.over?' (overripe)':''))}${row('Colour score',(r.s.col*100|0)+'%')}${row('Colour uniformity',(r.s.uni*100|0)+'%')}${row('Defects',`${r.defs.length} spot(s), ${(r.dp*100).toFixed(1)}% of surface`)}${row('Shape roundness',(r.rd*100|0)+'%')}${row('Size and weight',`${r.dMm|0} mm · ${r.wg|0} g`)}${row('Shelf life',r.shelf+' days')}${row('Rot level',`<span class="tag" style="background:${R.c}">${R.n}</span> ${R.x}/100`)}${row('Best use',r.use)}${row('Value',`₹${vl(r).toFixed(1)}`)}</table>`;
+ else if(TAB==1)h=`<p style="margin:0"><span class="tag" style="background:${R.c}">${R.n}</span> <b>${safe}</b></p><div class="rm"><i id="rmi"></i></div><div class="rl">${RL.map(z=>`<span>${z[1].split(' ')[0]}</span>`).join('')}</div><p class="mut">Why: defects cover ${(r.dp*100).toFixed(1)}% of the surface, ${r.defs.length} spot(s)${r.over?', dark overripe flesh colour':''}, colour uniformity ${r.s.uni*100|0}%.</p><h3 style="font-size:16px">What to make or do with it</h3><ul><li>${u[0]}</li></ul><p class="tip"><b>Safety</b>${u[1]}</p>`;
+ else h=tips(r).map(([a,b])=>`<div class="tip"><b>${a}</b>${b}</div>`).join('');
+ e.innerHTML=`<div class="ih"><h3>Report: ${items[i].name} · tomato #${j+1}</h3></div><div class="tabs">${['Result','Rot and uses','Next harvest'].map((t,k)=>`<button data-tb="${k}" class="${k==TAB?'on':''}">${t}</button>`).join('')}</div>${h}`;
+ if(TAB==1)setTimeout(()=>{const m=$('#rmi');if(m)m.style.left=R.x+'%'},60)}
+{const _p=pick;pick=function(i,j){_p(i,j);report(i,j)}}
+function extra(){const all=items.flatMap(i=>i.res),sm=$('#sm');$('#rep').hidden=!all.length;if(!all.length)return;
+ const rc=RL.map(()=>0),m=new Map();all.forEach(r=>{rc[rotOf(r).l]++;tips(r).forEach(([a,b])=>{const e=m.get(a)||{b,n:0};e.n++;m.set(a,e)})});
+ const L=[...m].sort((p,q)=>q[1].n-p[1].n).slice(0,6);
+ sm.insertAdjacentHTML('beforeend',`<h3 style="margin-top:14px">Rot across the lot</h3><div class="rb">${RL.map((z,k)=>rc[k]?`<span style="flex:${rc[k]};background:${z[2]}" title="${z[1]}: ${rc[k]}">${rc[k]}</span>`:'').join('')}</div><p class="mut" style="margin:4px 0 0">${RL.map((z,k)=>`<span style="color:${z[2]}">●</span> ${z[1]} ${rc[k]}`).join(' · ')}</p>
+ <h3 style="margin-top:14px">Next harvest checklist</h3><p class="mut" style="margin:0">Ranked by how many fruits show the problem. Tick items as you do them.</p><div>${L.map(([a,e])=>`<label class="ck"><input type="checkbox" data-ck><span><b>${a}</b> <em>${e.n} of ${all.length} fruits</em><br>${e.b}</span></label>`).join('')}</div><div class="row" style="align-items:center"><div class="pgb"><u id="pgu"></u></div><span class="mut" id="pgt">0 of ${L.length} done</span><button class="b g sm" id="cpy">Copy action plan</button></div>`);
+ $('#cpy').onclick=()=>{const t=document.createElement('textarea');t.value='NEXT HARVEST ACTION PLAN\n'+L.map(([a,e],k)=>`${k+1}. ${a} (${e.n}/${all.length} fruits): ${e.b}`).join('\n');document.body.append(t);t.select();document.execCommand('copy');t.remove();toast('Action plan copied')}}
+{const _s2=summary;summary=function(){_s2();extra()}}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-tb]');if(t&&REP){TAB=+t.dataset.tb;report(...REP)}});
+document.addEventListener('change',e=>{if(e.target.matches('[data-ck]')){const a=document.querySelectorAll('[data-ck]'),d=[...a].filter(x=>x.checked).length;$('#pgu').style.width=d/a.length*100+'%';$('#pgt').textContent=d+' of '+a.length+' done'}});
+{let n=0;const dp=$('#dp');addEventListener('dragenter',e=>{if([...(e.dataTransfer.types||[])].includes('Files')){n++;dp.hidden=false}});addEventListener('dragleave',()=>{if(--n<=0){n=0;dp.hidden=true}});addEventListener('dragover',e=>e.preventDefault());addEventListener('drop',e=>{e.preventDefault();n=0;dp.hidden=true;if(!e.target.closest('#dz'))addFiles(e.dataTransfer.files)})}
+{const _a=addFiles;addFiles=async function(fs){const k=[...fs].filter(f=>f.type.startsWith('image/')).length;if(!k)return;toast('Grading '+k+' photo'+(k>1?'s':'')+'…');await _a(fs);const n=items.length-1;if(items[n]&&items[n].res.length){pick(n,0);toast('Done · '+items.reduce((a,i)=>a+i.res.length,0)+' tomatoes graded');celebrate(items[n]);setTimeout(()=>$('#sm').scrollIntoView({behavior:'smooth'}),250)}}}
+
+const fx=$('#fx'),fc=fx.getContext('2d'),PS=[];let fl=0,SND=false,AC;
+const fz=()=>{fx.width=innerWidth;fx.height=innerHeight};fz();addEventListener('resize',fz);
+function burst(x,y,n,k){for(let i=0;i<n;i++){const a=Math.random()*6.28,v=3+Math.random()*9;PS.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-5,r:3+Math.random()*(k=='conf'?5:7),c:k=='conf'?['#c4372a','#2f7d32','#d9a21b','#fffaf0','#d9692b'][i%5]:'hsl('+Math.random()*12+' 80% '+(35+Math.random()*20)+'%)',life:140+Math.random()*60,rot:Math.random()*6,t:k,b:0})}if(!fl)loopF()}
+function loopF(){fl=1;fc.clearRect(0,0,fx.width,fx.height);for(let i=PS.length-1;i>=0;i--){const p=PS[i];p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.vx*=.995;p.rot+=.1;p.life--;
+ if(p.t=='rain'&&p.y>fx.height-p.r&&p.b<3){p.y=fx.height-p.r;p.vy*=-.55;p.b++}
+ if(p.life<=0||p.y>fx.height+40||p.x<-40||p.x>fx.width+40){PS.splice(i,1);continue}
+ fc.globalAlpha=Math.min(1,p.life/40);
+ if(p.t=='conf'){fc.fillStyle=p.c;fc.save();fc.translate(p.x,p.y);fc.rotate(p.rot);fc.fillRect(-p.r,-p.r/2,p.r*2,p.r);fc.restore()}
+ else{const g=fc.createRadialGradient(p.x-p.r*.3,p.y-p.r*.3,1,p.x,p.y,p.r);g.addColorStop(0,'#ff9a7a');g.addColorStop(1,p.c);fc.fillStyle=g;fc.beginPath();fc.arc(p.x,p.y,p.r,0,7);fc.fill()}}
+ fc.globalAlpha=1;if(PS.length)requestAnimationFrame(loopF);else{fl=0;fc.clearRect(0,0,fx.width,fx.height)}}
+function beep(f,d=.09){if(!SND)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain();o.type='square';o.frequency.value=f;g.gain.value=.04;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function celebrate(it){if(it&&it.res.some(r=>r.g==0)){burst(innerWidth/2,innerHeight*.35,80,'conf');beep(988,.15);setTimeout(()=>beep(1318,.2),150)}}
+$('#rn').onclick=()=>{for(let i=0;i<60;i++)setTimeout(()=>{PS.push({x:Math.random()*fx.width,y:-20,vx:(Math.random()-.5)*2,vy:2+Math.random()*3,r:10+Math.random()*16,c:'hsl('+Math.random()*12+' 78% 42%)',life:420,rot:0,t:'rain',b:0});if(!fl)loopF()},i*50)};
+$('#sd').onclick=()=>{SND=!SND;$('#sd').textContent=SND?'Sound on':'Sound off';$('#sd').classList.toggle('on',SND);beep(660)};
+$('#stg').addEventListener('click',e=>burst(e.clientX,e.clientY,45,'tom'));
+$('#xr').onclick=()=>{const h=$('#hm');h.checked=!h.checked;$('#xr').classList.toggle('on',h.checked);draw()};$('#hm').onchange=draw;
+{const _q=pick;pick=function(i,j){_q(i,j);beep([880,740,620,520,300][items[i].res[j].g],.07)}}
+function heat(x,it){x.save();x.filter='grayscale(1) contrast(1.15) brightness(.85)';x.drawImage(it.src,0,0);x.restore();
+ it.res.forEach(r=>{const c=RL[rotOf(r).l][2],w=(r.x1-r.x0)/2,h=(r.y1-r.y0)/2;x.save();x.globalCompositeOperation='multiply';x.translate(r.cx,r.cy);x.scale(1,h/w);const g=x.createRadialGradient(0,0,0,0,0,w);g.addColorStop(0,c+'dd');g.addColorStop(1,c+'33');x.fillStyle=g;x.beginPath();x.arc(0,0,w,0,7);x.fill();x.restore();
+  r.defs.forEach(d=>{const g2=x.createRadialGradient(d.x,d.y,0,d.x,d.y,d.r*2.4);g2.addColorStop(0,'rgba(255,40,0,.95)');g2.addColorStop(.5,'rgba(255,190,0,.55)');g2.addColorStop(1,'rgba(255,255,0,0)');x.fillStyle=g2;x.beginPath();x.arc(d.x,d.y,d.r*2.4,0,7);x.fill()})})}
+function hof(){const all=items.flatMap((it,i)=>it.res.map((r,j)=>({r,i,j}))),sm=$('#sm');if(!all.length)return;all.sort((a,b)=>b.r.score-a.r.score);
+ const avg=Math.round(all.reduce((a,o)=>a+o.r.score,0)/all.length);sm.insertAdjacentHTML('afterbegin',`<div class="dial" id="dl" style="--p:0"><b>${avg}</b></div>`);setTimeout(()=>{const d=$('#dl');if(d)d.style.setProperty('--p',avg)},80);
+ const h=document.createElement('div');h.className='hof';
+ [[all[0],'Best in lot','#2f7d32'],[all[all.length-1],'Needs attention','#7a2e4d']].forEach(([o,t,c])=>{const r=o.r,d=document.createElement('div'),k=document.createElement('canvas'),z=Math.max(r.x1-r.x0,r.y1-r.y0)*1.2;d.className='hf';d.style.borderColor=c;k.width=k.height=64;k.getContext('2d').drawImage(items[o.i].bs,r.cx-z/2,r.cy-z/2,z,z,0,0,64,64);d.append(k);
+  d.insertAdjacentHTML('beforeend',`<div><span class="mut">${t}</span><br><b>${G[r.g][0]} · ${r.score}</b></div>`);d.onclick=()=>{pick(o.i,o.j);$('#rep').scrollIntoView({behavior:'smooth'})};h.append(d)});sm.querySelector('.stats').after(h)}
+{const _s3=summary;summary=function(){_s3();hof()}}
+{const w=['tomatoes','harvest','profit','crates','soil'],u=document.querySelector('.hero h2 u');let k=0;setInterval(()=>{k=(k+1)%w.length;u.classList.remove('fp');void u.offsetWidth;u.textContent=w[k];u.classList.add('fp')},2400)}
+
+$('#bd').click();
+</script></body></html>
